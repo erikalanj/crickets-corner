@@ -1,0 +1,80 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&family=Poppins:wght@400;600&display=swap");
+
+:root {
+  --bg-dark: #464646;
+  --text-cream: #f9d289fe;
+  --font-main: "Quicksand", sans-serif;
+  --font-heading: "Poppins", sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-cream);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 1.2s ease-out both;
+  animation-delay: 0.6s;
+}
+
+.fade-in-delayed {
+  animation: fadeIn 1.2s ease-out both;
+  animation-delay: 0.8s;
+}
+
+/* Paw print decorations */
+.paw-decoration {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.paw-decoration img {
+  height: 150vh;
+  width: auto;
+  opacity: 0.12;
+}
+
+.paw-decoration.left {
+  left: 0;
+  transform: translateY(-50%) translateX(-50%) rotate(-90deg);
+}
+
+.paw-decoration.right {
+  right: 0;
+  transform: translateY(-50%) translateX(50%) rotate(90deg) scaleX(-1);
+}
