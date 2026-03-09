@@ -202,9 +202,9 @@
     }
 
     .photos {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 0.5rem;
-        flex-wrap: wrap;
     }
 
     .photo-btn {
@@ -215,6 +215,7 @@
         border-radius: 8px;
         overflow: hidden;
         transition: transform 0.2s ease;
+        aspect-ratio: 1;
     }
 
     .photo-btn:hover {
@@ -222,8 +223,8 @@
     }
 
     .photos img {
-        width: 150px;
-        height: 150px;
+        width: 100%;
+        height: 100%;
         object-fit: cover;
         border-radius: 8px;
         display: block;
