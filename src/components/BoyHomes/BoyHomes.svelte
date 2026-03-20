@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
     import { locations, type Location } from '$lib/data/location';
+    import { boyTimeline } from '$lib/data/boyTimeline';
     import type { Map, Marker } from 'leaflet';
 
     let mapContainer: HTMLDivElement;
@@ -12,28 +13,12 @@
     let timelineProgress = $state(0);
     let isTimelineScrubbing = $state(false);
 
-    const lifeStageNames = ['Baby', 'Teen', 'Old Man'];
+    const lifeStageNames = boyTimeline.map((stage) => stage.name);
     const stageAnchors = [0, 0.5, 1];
 
     const currentPhotos = $derived(selectedLocation?.photos ?? []);
     const modalPhoto = $derived(modalPhotoIndex !== null ? currentPhotos[modalPhotoIndex] : null);
-    const allTimelinePhotos = locations.flatMap((location) => location.photos);
-    const lifeStagePhotos = $derived.by(() => {
-        const photos = allTimelinePhotos;
-        if (photos.length === 0) {
-            return [] as { name: string; photo: string }[];
-        }
-
-        const firstPhoto = photos[0];
-        const middlePhoto = photos[Math.floor((photos.length - 1) / 2)] ?? firstPhoto;
-        const lastPhoto = photos[photos.length - 1] ?? middlePhoto;
-
-        return [
-            { name: lifeStageNames[0], photo: firstPhoto },
-            { name: lifeStageNames[1], photo: middlePhoto },
-            { name: lifeStageNames[2], photo: lastPhoto }
-        ];
-    });
+    const lifeStagePhotos = boyTimeline;
     const activeStageName = $derived(
         timelineProgress < 0.25
             ? lifeStageNames[0]
@@ -390,7 +375,7 @@
         background: rgba(255, 255, 255, 0.18);
         cursor: ew-resize;
         outline: none;
-        margin: 0.4rem 0 1.8rem;
+        margin: 0.4rem 0 2.5rem;
         transition: box-shadow 0.2s ease, background-color 0.2s ease;
     }
 
@@ -446,7 +431,7 @@
 
     .timeline-label {
         position: absolute;
-        top: 1.05rem;
+        top: calc(100% + 0.8rem);
         transform: translateX(-50%);
         font-size: 0.78rem;
         opacity: 0.85;
