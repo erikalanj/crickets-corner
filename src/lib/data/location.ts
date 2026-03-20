@@ -1,4 +1,6 @@
-import boyInVermont from "$lib/assets/boy/IMG_1622.jpg";
+import boyBaby from "$lib/assets/boy/IMG_1597.jpg";
+import boyTeen from "$lib/assets/boy/IMG_1613.jpg";
+import boyOldMan from "$lib/assets/boy/IMG_1629.jpg";
 
 export interface Location {
   id: string;
@@ -14,7 +16,7 @@ export const locations: Location[] = [
     name: "Vermont",
     coords: [44.26, -72.58],
     description: "my vermont home!",
-    photos: [boyInVermont], // Add photo paths here later
+    photos: [boyBaby, boyTeen, boyOldMan],
   },
   {
     id: "boston",
