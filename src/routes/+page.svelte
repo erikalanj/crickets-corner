@@ -1,6 +1,7 @@
 <script>
   import BoopCounter from '../components/BoopCounter/BoopCounter.svelte';
   import BoyHomes from '../components/BoyHomes/BoyHomes.svelte';
+  import FeedbackBox from '../components/FeedbackBox/FeedbackBox.svelte';
 </script>
 
 <main>
@@ -9,6 +10,8 @@
     <BoopCounter />
 
     <BoyHomes />
+
+    <FeedbackBox />
 </main>
 
 <style>
