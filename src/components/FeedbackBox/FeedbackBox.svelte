@@ -1,11 +1,32 @@
 <script lang="ts">
     import { boyTimeline } from '$lib/data/boyTimeline';
     import { locations } from '$lib/data/location';
-    import type { FeedbackTargetImage, FeedbackType } from '$lib/data/feedback';
+    import type { Feedback, FeedbackTargetImage, FeedbackType } from '$lib/data/feedback';
 
     let textFeedback = '';
     let feedbackType: FeedbackType = 'general';
     let targetImageId = '';
+    let uploadedImages: File[] = [];
+    let selectedLocation = '';
+    let selectedAge = '';
+
+    $: isGeneral = feedbackType === 'general';
+    $: isLocationCorrection = feedbackType === 'location-correction';
+    $: isTimelineCorrection = feedbackType === 'timeline-correction';
+
+    $: if (isGeneral) {
+        selectedLocation = '';
+        selectedAge = '';
+        targetImageId = '';
+    }
+
+    $: if (isLocationCorrection) {
+        selectedAge = '';
+    }
+
+    $: if (isTimelineCorrection) {
+        selectedLocation = '';
+    }
 
     const timelineTargets: FeedbackTargetImage[] = boyTimeline.map((stage, index) => ({
         id: `timeline-${index}`,
@@ -24,13 +45,35 @@
     );
 
     const targetImages: FeedbackTargetImage[] = [...timelineTargets, ...locationTargets];
+
+    function handleImageSelection(event: Event) {
+        const input = event.currentTarget as HTMLInputElement;
+        uploadedImages = input.files ? Array.from(input.files) : [];
+    }
+
+    function handleSubmit() {
+        if (!textFeedback.trim()) {
+            return;
+        }
+
+        const payload: Feedback = {
+            textFeedback,
+            selectedLocation: isLocationCorrection ? selectedLocation : '',
+            selectedAge: isTimelineCorrection ? selectedAge : '',
+            uploadedImages,
+            targetImageId: !isGeneral && targetImageId ? targetImageId : null,
+            feedbackType
+        };
+
+        console.log('Feedback payload:', payload);
+    }
 </script>
 
 <section class="feedback-box">
     <h2>Send Feedback</h2>
     <p class="subtitle">Notice an incorrect image or have a photo to share? Let me know!</p>
     
-    <form>
+    <form on:submit|preventDefault={handleSubmit}>
         <div class="field">
             <label for="feedbackType">Feedback Type</label>
             <div class="select-wrap">
@@ -43,21 +86,23 @@
             </div>
         </div>
 
-        <div class="field">
-            <label for="targetImage">Image on site (optional)</label>
-            <div class="select-wrap">
-                <select id="targetImage" bind:value={targetImageId}>
-                    <option value="">Select an existing image</option>
-                    {#each targetImages as image}
-                        <option value={image.id}>{image.label}</option>
-                    {/each}
-                </select>
-                <span class="select-arrow" aria-hidden="true">▾</span>
+        {#if !isGeneral}
+            <div class="field">
+                <label for="targetImage">Image on site</label>
+                <div class="select-wrap">
+                    <select id="targetImage" bind:value={targetImageId}>
+                        <option value="">Select an existing image</option>
+                        {#each targetImages as image}
+                            <option value={image.id}>{image.label}</option>
+                        {/each}
+                    </select>
+                    <span class="select-arrow" aria-hidden="true">▾</span>
+                </div>
             </div>
-        </div>
+        {/if}
 
         <div class="field">
-            <label for="textFeedback">Your feedback</label>
+            <label for="textFeedback">{isGeneral ? 'Your feedback' : 'Describe the correction'}</label>
             <textarea
                 id="textFeedback" 
                 bind:value={textFeedback} 
@@ -65,6 +110,59 @@
                 placeholder="Tell me what should be corrected!!"
             ></textarea>
         </div>
+
+        <div class="field">
+            <label for="imageUpload">Upload images (optional)</label>
+            <input
+                id="imageUpload"
+                type="file"
+                accept="image/*"
+                multiple
+                on:change={handleImageSelection}
+            />
+
+            {#if uploadedImages.length > 0}
+                <p class="file-count">{uploadedImages.length} image(s) selected</p>
+                <ul class="file-list">
+                    {#each uploadedImages as image}
+                        <li>{image.name}</li>
+                    {/each}
+                </ul>
+            {/if}
+        </div>
+
+        {#if isLocationCorrection}
+            <div class="field">
+                <label for="selectedLocation">Correct location</label>
+                <div class="select-wrap">
+                    <select id="selectedLocation" bind:value={selectedLocation}>
+                        <option value="">Select location</option>
+                        {#each locations as location}
+                            <option value={location.name}>{location.name}</option>
+                        {/each}
+                    </select>
+                    <span class="select-arrow" aria-hidden="true">▾</span>
+                </div>
+            </div>
+        {/if}
+
+        {#if isTimelineCorrection}
+            <div class="field">
+                <label for="selectedAge">Correct age stage</label>
+                <div class="select-wrap">
+                    <select id="selectedAge" bind:value={selectedAge}>
+                        <option value="">Select age stage</option>
+                        {#each boyTimeline as stage}
+                            <option value={stage.name}>{stage.name}</option>
+                        {/each}
+                    </select>
+                    <span class="select-arrow" aria-hidden="true">▾</span>
+                </div>
+            </div>
+        {/if}
+
+        <button type="submit" class="submit-btn">Submit Feedback</button>
+
     </form>
 </section>
 
@@ -135,6 +233,7 @@
     }
 
     select,
+    input,
     textarea {
         width: 100%;
         padding: 0.7rem;
@@ -177,5 +276,53 @@
 
     textarea::placeholder {
         color: rgba(255, 220, 180, 0.72);
+    }
+
+    input[type='file'] {
+        cursor: pointer;
+    }
+
+    input[type='file']::file-selector-button {
+        margin-right: 0.75rem;
+        padding: 0.45rem 0.75rem;
+        border: 1px solid rgba(255, 154, 47, 0.5);
+        border-radius: 6px;
+        background: #5a5a5a;
+        color: #ffd7a3;
+        cursor: pointer;
+    }
+
+    .file-count {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--orange-soft);
+    }
+
+    .file-list {
+        margin: 0;
+        padding-left: 1.1rem;
+        color: #ffd7a3;
+    }
+
+    .submit-btn {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 154, 47, 0.5);
+        background: #555555;
+        color: #ffd7a3;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 180ms ease, transform 180ms ease, border-color 180ms ease;
+    }
+
+    .submit-btn:hover {
+    background: #666666;
+    border-color: rgba(255, 154, 47, 0.8);
+    transform: translateY(-1px);
+    }
+
+    .submit-btn:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 154, 47, 0.2);
     }
 </style>
