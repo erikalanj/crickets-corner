@@ -214,6 +214,7 @@
         --orange: #ff9a2f;
         --orange-soft: #ffc47a;
 
+        width: 100%;
         max-width: 600px;
         margin: 3rem auto;
         padding: 2rem;
@@ -380,5 +381,16 @@
         background: rgba(255, 154, 47, 0.12);
         color: var(--orange-soft);
         font-weight: 600;
+    }
+
+    @media (max-width: 700px) {
+        .feedback-box {
+            margin: 1.75rem auto;
+            padding: 1rem;
+        }
+
+        form {
+            gap: 1rem;
+        }
     }
 </style>

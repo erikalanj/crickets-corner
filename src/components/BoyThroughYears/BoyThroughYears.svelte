@@ -257,4 +257,29 @@
         margin: 0;
         text-align: center;
     }
+
+    @media (max-width: 700px) {
+        .boy-years {
+            padding: 1rem;
+        }
+
+        .timeline-track {
+            height: 24px;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-thumb {
+            width: 20px;
+            height: 20px;
+        }
+
+        .timeline-stop {
+            width: 8px;
+            height: 8px;
+        }
+
+        .timeline-label {
+            font-size: 0.7rem;
+        }
+    }
 </style>

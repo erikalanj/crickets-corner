@@ -16,7 +16,7 @@
 
 <style>
     img {
-        width: 500px;
+        width: min(500px, 92vw);
         height: auto;
         border-radius: 12px;
         cursor: pointer;
@@ -38,7 +38,7 @@
     
     .nose-hotspot {
         position: absolute;
-        top: 53%;      /* adjust to nose position */
+        top: 53%;
         left: 60%;
         width: 60px;
         height: 60px;
@@ -47,5 +47,12 @@
         border: none;
         cursor: pointer;
         transform: translate(-50%, -50%);
+    }
+
+    @media (max-width: 700px) {
+        .nose-hotspot {
+            width: 44px;
+            height: 44px;
+        }
     }
 </style>

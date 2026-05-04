@@ -318,4 +318,37 @@
         border-radius: 8px;
         cursor: default;
     }
+
+    @media (max-width: 700px) {
+        .boy-homes {
+            margin: 1.25rem auto;
+        }
+
+        .map-container {
+            height: 280px;
+            border-width: 4px;
+        }
+
+        .map-container:hover {
+            transform: none;
+        }
+
+        .location-detail {
+            padding: 1rem;
+        }
+
+        .modal-nav {
+            width: 46px;
+            height: 62px;
+            font-size: 2rem;
+        }
+
+        .modal-prev {
+            left: 0.35rem;
+        }
+
+        .modal-next {
+            right: 0.35rem;
+        }
+    }
 </style>

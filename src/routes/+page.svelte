@@ -23,7 +23,7 @@
         align-items: center;
         text-align: center;
         gap: 1rem;
-        padding: 2rem;
+        padding: 1.25rem;
     }
 
     h1 {
@@ -31,12 +31,13 @@
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 5rem;
+        font-size: clamp(2.2rem, 10vw, 5rem);
         letter-spacing: 0.05em;
+        line-height: 1.08;
     }
 
     h3 {
-        font-size: 2.3rem;
+        font-size: clamp(1.15rem, 5vw, 2.3rem);
         font-weight: 400;
         opacity: 0.85;
     }
@@ -50,5 +51,12 @@
 
     .review-link:hover {
         text-decoration: underline;
+    }
+
+    @media (max-width: 700px) {
+        main {
+            gap: 0.8rem;
+            padding: 1rem 0.75rem;
+        }
     }
 </style>
