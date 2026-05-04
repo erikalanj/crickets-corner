@@ -1,14 +1,17 @@
 <script lang="ts">
     import { boyTimeline } from '$lib/data/boyTimeline';
     import { locations } from '$lib/data/location';
-    import type { Feedback, FeedbackTargetImage, FeedbackType } from '$lib/data/feedback';
+    import type { FeedbackAttachment, FeedbackSubmission, FeedbackTargetImage, FeedbackType } from '$lib/data/feedback';
 
     let textFeedback = '';
     let feedbackType: FeedbackType = 'general';
     let targetImageId = '';
     let uploadedImages: File[] = [];
+    let imageInput: HTMLInputElement | null = null;
     let selectedLocation = '';
     let selectedAge = '';
+    let isSubmitting = false;
+    let submitMessage = '';
 
     $: isGeneral = feedbackType === 'general';
     $: isLocationCorrection = feedbackType === 'location-correction';
@@ -51,21 +54,59 @@
         uploadedImages = input.files ? Array.from(input.files) : [];
     }
 
-    function handleSubmit() {
-        if (!textFeedback.trim()) {
+    async function handleSubmit() {
+        if (isSubmitting || !textFeedback.trim()) {
             return;
         }
 
-        const payload: Feedback = {
-            textFeedback,
+        isSubmitting = true;
+        submitMessage = '';
+
+        const payload: FeedbackSubmission = {
+            textFeedback: textFeedback.trim(),
             selectedLocation: isLocationCorrection ? selectedLocation : '',
             selectedAge: isTimelineCorrection ? selectedAge : '',
-            uploadedImages,
+            uploadedImages: uploadedImages.map((file): FeedbackAttachment => ({
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                lastModified: file.lastModified
+            })),
             targetImageId: !isGeneral && targetImageId ? targetImageId : null,
             feedbackType
         };
 
-        console.log('Feedback payload:', payload);
+        try {
+            const response = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = (await response.json().catch(() => null)) as { message?: string } | null;
+
+            if (!response.ok) {
+                throw new Error(result?.message ?? 'Unable to send feedback right now.');
+            }
+
+            submitMessage = 'Thanks. Your feedback was sent to the inbox.';
+            textFeedback = '';
+            targetImageId = '';
+            selectedLocation = '';
+            selectedAge = '';
+            uploadedImages = [];
+            feedbackType = 'general';
+
+            if (imageInput) {
+                imageInput.value = '';
+            }
+        } catch (error) {
+            submitMessage = error instanceof Error ? error.message : 'Unable to send feedback right now.';
+        } finally {
+            isSubmitting = false;
+        }
     }
 </script>
 
@@ -115,6 +156,7 @@
             <label for="imageUpload">Upload images (optional)</label>
             <input
                 id="imageUpload"
+                bind:this={imageInput}
                 type="file"
                 accept="image/*"
                 multiple
@@ -161,7 +203,13 @@
             </div>
         {/if}
 
-        <button type="submit" class="submit-btn">Submit Feedback</button>
+        <button type="submit" class="submit-btn" disabled={isSubmitting}>
+            {isSubmitting ? 'Sending...' : 'Submit Feedback'}
+        </button>
+
+        {#if submitMessage}
+            <p class="submit-message" role="status" aria-live="polite">{submitMessage}</p>
+        {/if}
 
     </form>
 </section>
@@ -315,6 +363,12 @@
         transition: background 180ms ease, transform 180ms ease, border-color 180ms ease;
     }
 
+    .submit-btn:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+        transform: none;
+    }
+
     .submit-btn:hover {
     background: #666666;
     border-color: rgba(255, 154, 47, 0.8);
@@ -324,5 +378,15 @@
     .submit-btn:focus {
         outline: none;
         box-shadow: 0 0 0 3px rgba(255, 154, 47, 0.2);
+    }
+
+    .submit-message {
+        margin: 0;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 154, 47, 0.35);
+        background: rgba(255, 154, 47, 0.12);
+        color: var(--orange-soft);
+        font-weight: 600;
     }
 </style>

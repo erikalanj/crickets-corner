@@ -12,6 +12,8 @@
     <BoyHomes />
 
     <FeedbackBox />
+
+    <a class="review-link" href="/feedback-inbox">Review feedback inbox</a>
 </main>
 
 <style>
@@ -26,6 +28,7 @@
 
     h1 {
         background: -webkit-linear-gradient(#f9d289fe, #eee);
+        background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-size: 5rem;
@@ -36,5 +39,16 @@
         font-size: 2.3rem;
         font-weight: 400;
         opacity: 0.85;
+    }
+
+    .review-link {
+        margin-top: 0.5rem;
+        color: #ffd7a3;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .review-link:hover {
+        text-decoration: underline;
     }
 </style>
