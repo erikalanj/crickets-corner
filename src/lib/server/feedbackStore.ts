@@ -11,6 +11,7 @@ import type {
 export interface StoredFeedbackSubmission extends FeedbackSubmission {
   id: string;
   createdAt: string;
+  resolved?: boolean;
 }
 
 const storeDirectory = path.join(process.cwd(), ".feedback");
@@ -60,6 +61,7 @@ export async function createFeedbackSubmission(
   const storedSubmission: StoredFeedbackSubmission = {
     id: randomUUID(),
     createdAt: new Date().toISOString(),
+    resolved: false,
     ...submission,
   };
 
@@ -67,6 +69,22 @@ export async function createFeedbackSubmission(
   await writeStoredFeedback(existingSubmissions);
 
   return storedSubmission;
+}
+
+export async function toggleResolved(id: string, resolved: boolean) {
+  const submissions = await readStoredFeedback();
+  const idx = submissions.findIndex((s) => s.id === id);
+  if (idx === -1) return null;
+  submissions[idx].resolved = resolved;
+  await writeStoredFeedback(submissions);
+  return submissions[idx];
+}
+
+export async function deleteFeedbackSubmission(id: string) {
+  const submissions = await readStoredFeedback();
+  const remaining = submissions.filter((s) => s.id !== id);
+  await writeStoredFeedback(remaining);
+  return remaining.length !== submissions.length;
 }
 
 export function isFeedbackType(value: string): value is FeedbackType {

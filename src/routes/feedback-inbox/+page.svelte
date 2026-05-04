@@ -1,13 +1,35 @@
 <script lang="ts">
   import type { StoredFeedbackSubmission } from '$lib/server/feedbackStore';
 
-  let { data } = $props<{ data: { submissions: StoredFeedbackSubmission[] } }>();
+  export let data: { submissions: StoredFeedbackSubmission[] };
+
+  let submissions: StoredFeedbackSubmission[] = data.submissions || [];
 
   const formatDate = (value: string) =>
     new Intl.DateTimeFormat('en-US', {
       dateStyle: 'medium',
       timeStyle: 'short'
     }).format(new Date(value));
+
+  async function markResolved(id: string) {
+    // optimistic UI
+    const idx = submissions.findIndex((s) => s.id === id);
+    if (idx === -1) return;
+    submissions[idx].resolved = true;
+
+    const res = await fetch(`/api/feedback/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resolved: true })
+    });
+
+    if (!res.ok) {
+      // revert
+      submissions[idx].resolved = false;
+      const body = await res.json().catch(() => null);
+      alert(body?.message ?? 'Unable to mark resolved');
+    }
+  }
 </script>
 
 <svelte:head>
@@ -26,15 +48,24 @@
       <span class="count-pill">{data.submissions.length} total</span>
     </div>
 
-    {#if data.submissions.length === 0}
+    {#if submissions.length === 0}
       <p class="empty-state">No feedback has been submitted yet.</p>
     {:else}
       <div class="submissions">
-        {#each data.submissions as submission}
+        {#each submissions as submission}
           <article class="submission-card">
             <div class="submission-meta">
-              <strong>{submission.feedbackType}</strong>
-              <span>{formatDate(submission.createdAt)}</span>
+              <div>
+                <strong>{submission.feedbackType}</strong>
+                <span>{formatDate(submission.createdAt)}</span>
+              </div>
+              <div>
+                {#if submission.resolved}
+                  <span class="resolved-pill">Resolved</span>
+                {:else}
+                  <button class="resolve-btn" on:click={() => markResolved(submission.id)}>Mark resolved</button>
+                {/if}
+              </div>
             </div>
 
             <p class="submission-text">{submission.textFeedback}</p>
@@ -195,5 +226,24 @@
   .attachments ul {
     margin: 0;
     padding-left: 1.1rem;
+  }
+
+  .resolve-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 154, 47, 0.4);
+    color: #ffd7a3;
+    padding: 0.35rem 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .resolved-pill {
+    display: inline-block;
+    padding: 0.35rem 0.6rem;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    color: #9fd3a6;
+    font-weight: 700;
   }
 </style>
