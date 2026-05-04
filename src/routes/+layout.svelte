@@ -2,6 +2,7 @@
 	import favicon from '$lib/assets/favicon.png';
 	import pawprints from '$lib/assets/pawprints-removebg-preview.png';
 	import '../app.css';
+	import Footer from '../components/Footer/Footer.svelte';
 
 	let { children } = $props();
 </script>
@@ -18,4 +19,24 @@
 	<img src={pawprints} alt="" />
 </div>
 
-{@render children()}
+<div class="page-shell">
+	<div class="page-content">
+		{@render children()}
+	</div>
+	<Footer />
+</div>
+
+<style>
+	.page-shell {
+		width: min(1100px, 100%);
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 1rem 1rem 2rem;
+	}
+
+	.page-content {
+		width: 100%;
+	}
+</style>
