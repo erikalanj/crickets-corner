@@ -18,6 +18,8 @@ const storeFilePath = path.join(storeDirectory, "feedback-submissions.json");
 
 async function ensureStoreDirectory() {
   await mkdir(storeDirectory, { recursive: true });
+  // ensure uploads directory exists
+  await mkdir(path.join(storeDirectory, "uploads"), { recursive: true });
 }
 
 async function readStoredFeedback(): Promise<StoredFeedbackSubmission[]> {

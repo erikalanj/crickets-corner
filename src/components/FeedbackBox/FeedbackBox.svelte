@@ -62,30 +62,24 @@
         isSubmitting = true;
         submitMessage = '';
 
-        const payload: FeedbackSubmission = {
-            textFeedback: textFeedback.trim(),
-            selectedLocation: isLocationCorrection ? selectedLocation : '',
-            selectedAge: isTimelineCorrection ? selectedAge : '',
-            uploadedImages: uploadedImages.map((file): FeedbackAttachment => ({
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                lastModified: file.lastModified
-            })),
-            targetImageId: !isGeneral && targetImageId ? targetImageId : null,
-            feedbackType
-        };
-
         try {
+            const form = new FormData();
+            form.set('textFeedback', textFeedback.trim());
+            form.set('selectedLocation', isLocationCorrection ? selectedLocation : '');
+            form.set('selectedAge', isTimelineCorrection ? selectedAge : '');
+            form.set('targetImageId', !isGeneral && targetImageId ? targetImageId : '');
+            form.set('feedbackType', feedbackType);
+
+            for (const file of uploadedImages) {
+                form.append('uploadedImages', file, file.name);
+            }
+
             const response = await fetch('/api/feedback', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
+                body: form
             });
 
-            const result = (await response.json().catch(() => null)) as { message?: string } | null;
+            const result = (await response.json().catch(() => null)) as { message?: string; submission?: { id?: string } } | null;
 
             if (!response.ok) {
                 throw new Error(result?.message ?? 'Unable to send feedback right now.');
@@ -99,11 +93,9 @@
             uploadedImages = [];
             feedbackType = 'general';
 
-            if (imageInput) {
-                imageInput.value = '';
-            }
-        } catch (error) {
-            submitMessage = error instanceof Error ? error.message : 'Unable to send feedback right now.';
+            if (imageInput) imageInput.value = '';
+        } catch (err) {
+            submitMessage = err instanceof Error ? err.message : String(err);
         } finally {
             isSubmitting = false;
         }
@@ -148,7 +140,7 @@
                 id="textFeedback" 
                 bind:value={textFeedback} 
                 rows="4"
-                placeholder="Tell me what should be corrected!!"
+                placeholder="Tell me what should be corrected, or what photo should be added!!"
             ></textarea>
         </div>
 

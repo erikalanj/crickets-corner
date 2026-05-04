@@ -59,7 +59,12 @@
                 <h2>Attached files</h2>
                 <ul>
                   {#each submission.uploadedImages as image}
-                    <li>{image.name} ({Math.round(image.size / 1024)} KB)</li>
+                    <li>
+                      <a href={`/api/feedback/file/${submission.id}/${image.name}`} target="_blank" rel="noopener noreferrer">
+                        {image.name}
+                      </a>
+                      ({Math.round(image.size / 1024)} KB)
+                    </li>
                   {/each}
                 </ul>
               </div>

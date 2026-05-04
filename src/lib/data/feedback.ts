@@ -25,6 +25,7 @@ export interface FeedbackAttachment {
   size: number;
   type: string;
   lastModified: number;
+  path?: string;
 }
 
 export interface FeedbackSubmission {
