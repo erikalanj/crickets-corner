@@ -21,7 +21,7 @@
 
 <footer class="site-footer">
   Made with ♡ · 2026 ·
-  <a href="https://github.com/erikalanj/crickets-corner" target="_blank" rel="noreferrer">
+  <a href="https://github.com/erikalanj" target="_blank" rel="noreferrer">
     More Stuff
   </a>
 </footer>
